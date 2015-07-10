@@ -3,14 +3,18 @@
 
 <script>
 	$(function() {
-		var socket = io.connect('#{HOST}'),
-			nickname = '#{nickname}',competitor,
-			players = '#{players}'.split(',');
+		var socket = io.connect('<%= HOST %>'),
+			roomId = '<%= roomId %>',
+			nickname = '<%= nickname %>',competitor,
+			players = '<%= players %>'.split(',');
 		//console.log(players);
+
+		//告诉服务器端已登陆
+		socket.emit('login', { roomid: roomId, username: nickname });
 
 		if (players.length == 2) {
 			//告诉服务器游戏开始
-			socket.emit('match', {roomid: '#{roomId}', players: players});
+			socket.emit('match', { roomid: roomId, players: players });
 		}
 
 		socket.on('match', function(message) {

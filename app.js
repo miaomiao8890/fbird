@@ -21,6 +21,7 @@ app.get('/games/online/:nickname', function (req, res) {
 	var nick = req.params.nickname,roomid,
 		pageData = {
 			PORT: PORT,
+			HOST: HOST,
 			title: "联机对战",
 			nickname: nick
 		}
@@ -30,27 +31,36 @@ app.get('/games/online/:nickname', function (req, res) {
 		//添加等待房间
 		DB['waitingRoom'] = [roomid];
 		//添加玩家
-		DB[roomid] = [nick];
+		DB[roomid] = { players: [nick], sockets: [] };
 		pageData.players = [nick];
 	}
 	else {
 		//获取等待房间
 		roomid = DB['waitingRoom'].pop(); 
 		//添加玩家
-		DB[roomid].push(nick);
-		pageData.players = DB[roomid];
+		DB[roomid].players.push(nick);
+		pageData.players = DB[roomid].players;
 		//socket.emit('message', { channel: 'game.' + roomid, data: { type: 'start', players: DB[roomid] } });
 	}
 	pageData.roomId = roomid;
-	console.log(DB);
+	//console.log(DB);
 	res.render('games/online', pageData);
 });
 
 io.sockets.on('connection', function(socket) {
 	console.log('a user connected');
 
+	socket.on('login', function(data) {
+		//socket.name = data.username;
+		DB[data.roomid].sockets.push(this);
+		//console.log(DB[data.roomid].sockets);
+	});
+
 	socket.on('match', function(data) {
-		//console.log('match:'+data);
-		io.sockets.emit('match', data.players);
+		//console.log(task)
+		console.log(data);
+		for (var i = 0; i < DB[data.roomid].sockets.length; i++) {
+			DB[data.roomid].sockets[i].emit('match', data.players);
+		}
 	});
 });
