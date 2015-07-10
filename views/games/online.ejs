@@ -24,10 +24,10 @@
 		});
 
 		socket.on('message', function(message) {
-			console.log(message.data);
-			switch(message.data.type) {
-				case 'move':
-					console.log('跳跃');
+			console.log(message);
+			switch(message.type) {
+				case 'jump':
+					jump(message.player);
 					break;
 				default:
 					console.log('场景');
@@ -44,5 +44,17 @@
 		function addUser(player) {
 			$('#dancefloor').append("<div class='dancer'><div class='nickname'>" + player + "</div><div class='user hi' id='" + player + "'></div></div>");
 		}
+
+		function jump(name) {
+			if ($('#'+name).hasClass('hi')) $('#'+name).removeClass('hi').addClass('up')
+			else $('#'+name).removeClass('up').addClass('hi')
+		}
+
+		$('body').keyup(function(e) {
+			if (e.keyCode == 32) {
+				jump(nickname);
+				socket.emit('message', { type: 'jump', roomid: roomId, player: nickname});
+			}
+		});
 	});
 </script>

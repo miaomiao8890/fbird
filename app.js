@@ -48,19 +48,24 @@ app.get('/games/online/:nickname', function (req, res) {
 });
 
 io.sockets.on('connection', function(socket) {
-	console.log('a user connected');
 
 	socket.on('login', function(data) {
-		//socket.name = data.username;
+		console.log(data.username + ' connected');
+		
+		socket.name = data.username;
 		DB[data.roomid].sockets.push(this);
 		//console.log(DB[data.roomid].sockets);
 	});
 
 	socket.on('match', function(data) {
-		//console.log(task)
-		console.log(data);
+		//console.log(data);
 		for (var i = 0; i < DB[data.roomid].sockets.length; i++) {
 			DB[data.roomid].sockets[i].emit('match', data.players);
 		}
+	});
+
+	socket.on('message', function(data) {
+		var s_socket = DB[data.roomid].sockets[0].name == data.player ? DB[data.roomid].sockets[1] : DB[data.roomid].sockets[0];
+		s_socket.emit('message', { type: data.type, player: data.player });
 	});
 });
