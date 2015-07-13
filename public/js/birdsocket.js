@@ -9,11 +9,11 @@
  *     jumpFn: function() {}       //跳跃函数
  * }
  */
-var BirdScoket = function(opt) {
-	return (this instanceof BirdScoket) ? this.init(opt) : new BirdScoket(opt);
+var BirdSocket = function(opt) {
+	return (this instanceof BirdSocket) ? this.init(opt) : new BirdSocket(opt);
 }
 
-BirdScoket.prototype = {
+BirdSocket.prototype = {
 	init: function(opt) {
 		socket = io.connect(opt.HOST);
 		//告诉服务器端已登陆
@@ -38,6 +38,10 @@ BirdScoket.prototype = {
 			switch(message.type) {
 				case 'jump':
 					opt.jumpFn(message.player);
+					break;
+				case 'disconnect':
+					opt.gameOverFn();
+					socket.emit('disconnect');
 					break;
 				default:
 					console.log('场景');

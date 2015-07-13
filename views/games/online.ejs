@@ -36,12 +36,13 @@
 		// });
 
 		//调用websocket功能
-		var birdscoket = new BirdScoket({
+		var birdsocket = new BirdSocket({
 			HOST: '<%= HOST %>',
 			roomId: roomId,
 			nickname: nickname,
 			players: players,
 			gameInitFn: gameInit,
+			gameOverFn: gameOver,
 			jumpFn: jump
 		})
 
@@ -50,6 +51,11 @@
 			var competitor = players[0] != nickname ? players[0] : players[1];
 			addUser(nickname);
 			addUser(competitor);
+		}
+
+		function gameOver() {
+			$('#dancefloor').html('');
+			$('h1').text('游戏断开连接');
 		}
 
 		function addUser(player) {
@@ -65,7 +71,7 @@
 			if (e.keyCode == 32) {
 				jump(nickname);
 				//socket.emit('message', { type: 'jump', roomid: roomId, player: nickname});
-				birdscoket.sendMessage({
+				birdsocket.sendMessage({
 					type: 'jump', 
 					roomid: roomId, 
 					player: nickname

@@ -36,11 +36,18 @@ app.get('/games/online/:nickname', function (req, res) {
 	}
 	else {
 		//获取等待房间
-		roomid = DB['waitingRoom'].pop(); 
-		//添加玩家
-		DB[roomid].players.push(nick);
-		pageData.players = DB[roomid].players;
-		//socket.emit('message', { channel: 'game.' + roomid, data: { type: 'start', players: DB[roomid] } });
+		roomid = DB['waitingRoom'][DB['waitingRoom'].length-1];
+		//判断是否页面刷新
+		if (DB[roomid]) {
+			DB['waitingRoom'].pop();
+			//添加玩家
+			DB[roomid].players.push(nick);
+			pageData.players = DB[roomid].players;
+		} 
+		else {
+			DB[roomid] = { players: [nick], sockets: [] };
+			pageData.players = [nick];		
+		}
 	}
 	pageData.roomId = roomid;
 	//console.log(DB);
@@ -48,15 +55,28 @@ app.get('/games/online/:nickname', function (req, res) {
 });
 
 io.sockets.on('connection', function(socket) {
-
+	//监听用户加入
 	socket.on('login', function(data) {
 		console.log(data.username + ' connected');
 
 		socket.name = data.username;
+		socket.roomid = data.roomid;
 		DB[data.roomid].sockets.push(this);
 		//console.log(DB[data.roomid].sockets);
 	});
 
+	//监听用户退出
+    socket.on('disconnect', function(){
+    	//将信息发送给用户
+    	if (DB[socket.roomid]) {
+	    	for (var i = 0; i < DB[socket.roomid].sockets.length; i++) {
+	    		DB[socket.roomid].sockets[i].emit('message', { type: 'disconnect'});
+	    	}
+	    	//删除DB
+	    	delete DB[socket.roomid];
+    	}
+    });
+    //监听用户匹配
 	socket.on('match', function(data) {
 		//console.log(data);
 		for (var i = 0; i < DB[data.roomid].sockets.length; i++) {
