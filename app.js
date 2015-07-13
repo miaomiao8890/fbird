@@ -51,7 +51,7 @@ io.sockets.on('connection', function(socket) {
 
 	socket.on('login', function(data) {
 		console.log(data.username + ' connected');
-		
+
 		socket.name = data.username;
 		DB[data.roomid].sockets.push(this);
 		//console.log(DB[data.roomid].sockets);
@@ -65,6 +65,7 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('message', function(data) {
+		console.log(data)
 		var s_socket = DB[data.roomid].sockets[0].name == data.player ? DB[data.roomid].sockets[1] : DB[data.roomid].sockets[0];
 		s_socket.emit('message', { type: data.type, player: data.player });
 	});

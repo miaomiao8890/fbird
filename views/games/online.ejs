@@ -1,42 +1,53 @@
 <h1 class="title">正在匹配 <%= roomId %> <%= nickname %></h1>
 <div id="dancefloor"></div>
 
+<script src="../../js/birdsocket.js"></script>
 <script>
 	$(function() {
-		var socket = io.connect('<%= HOST %>'),
-			roomId = '<%= roomId %>',
-			nickname = '<%= nickname %>',competitor,
+		//var socket = io.connect('<%= HOST %>'),
+		var roomId = '<%= roomId %>',
+			nickname = '<%= nickname %>',
 			players = '<%= players %>'.split(',');
 		//console.log(players);
 
-		//告诉服务器端已登陆
-		socket.emit('login', { roomid: roomId, username: nickname });
+		// //告诉服务器端已登陆
+		// socket.emit('login', { roomid: roomId, username: nickname });
 
-		if (players.length == 2) {
-			//告诉服务器游戏开始
-			socket.emit('match', { roomid: roomId, players: players });
-		}
+		// if (players.length == 2) {
+		// 	//告诉服务器游戏开始
+		// 	socket.emit('match', { roomid: roomId, players: players });
+		// }
 
-		socket.on('match', function(message) {
-			console.log(message);
-			//游戏初始化
-			gameInit(message);
-		});
+		// socket.on('match', function(message) {
+		// 	console.log(message);
+		// 	//游戏初始化
+		// 	gameInit(message);
+		// });
 
-		socket.on('message', function(message) {
-			console.log(message);
-			switch(message.type) {
-				case 'jump':
-					jump(message.player);
-					break;
-				default:
-					console.log('场景');
-			}
-		});
+		// socket.on('message', function(message) {
+		// 	console.log(message);
+		// 	switch(message.type) {
+		// 		case 'jump':
+		// 			jump(message.player);
+		// 			break;
+		// 		default:
+		// 			console.log('场景');
+		// 	}
+		// });
 
-		function gameInit(players) {
+		//调用websocket功能
+		var birdscoket = new BirdScoket({
+			HOST: '<%= HOST %>',
+			roomId: roomId,
+			nickname: nickname,
+			players: players,
+			gameInitFn: gameInit,
+			jumpFn: jump
+		})
+
+		function gameInit(players, nickname) {
 			$('h1').text('游戏开始');
-			competitor = players[0] != nickname ? players[0] : players[1];
+			var competitor = players[0] != nickname ? players[0] : players[1];
 			addUser(nickname);
 			addUser(competitor);
 		}
@@ -53,7 +64,12 @@
 		$('body').keyup(function(e) {
 			if (e.keyCode == 32) {
 				jump(nickname);
-				socket.emit('message', { type: 'jump', roomid: roomId, player: nickname});
+				//socket.emit('message', { type: 'jump', roomid: roomId, player: nickname});
+				birdscoket.sendMessage({
+					type: 'jump', 
+					roomid: roomId, 
+					player: nickname
+				});
 			}
 		});
 	});
