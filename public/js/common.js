@@ -1,0 +1,21 @@
+var DEFAULTS_WARP = document.body
+   , DEFAULTS_WIN_HEIGHT = document.documentElement.clientHeight
+   , DEFAULTS_WIN_WIDTH = document.documentElement.clientWidth
+   , DEFAULTS_H_SCALE = DEFAULTS_WIN_HEIGHT/600 
+   , DEFAULTS_H_W_SCALE = 16/9  // 默认高宽比为16:9
+   , DEFAULTS_BOARD_WIDTH = DEFAULTS_WIN_HEIGHT / DEFAULTS_H_W_SCALE
+   , DEFAULTS_BIRD_H = DEFAULTS_WIN_HEIGHT * 0.045
+   , DEFAULTS_BIRD_W = DEFAULTS_WIN_HEIGHT * 0.045
+   , DEFAULTS_G = 10/1000/1000*100 * DEFAULTS_H_SCALE
+   , DEFAULTS_V = -.4 * 10 /1000*100 * DEFAULTS_H_SCALE
+
+   , DEFAULTS_DOM = {
+      fps:document.getElementById("J_fps")
+      ,dis:document.getElementById("J_distance")
+   }
+   , DEFAULTS_CDE_WIDTH = parseInt(DEFAULTS_BIRD_W*3)
+   , DEFAULTS_CDE_L = (DEFAULTS_WIN_WIDTH - DEFAULTS_CDE_WIDTH)/2
+   , DEFAULTS_CDE_R = (DEFAULTS_WIN_WIDTH + DEFAULTS_CDE_WIDTH)/2
+   ;
+
+   console.log(DEFAULTS_H_SCALE);
